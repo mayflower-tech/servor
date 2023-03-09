@@ -30,6 +30,6 @@ jobs:
           cache: yarn
           registry-url: https://npm.pkg.github.com/
       - run: yarn install --immutable
-      - run: yarn publish
+      - run: yarn npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
