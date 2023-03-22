@@ -12,6 +12,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mayflower-tech/servor@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@mayflower-tech/servor@workspace:."
+  dependencies:
+    "@types/http-proxy": ^1.17.10
+    "@types/node": ^18.14.6
+    chokidar: ^3.5.3
+    http-proxy: ^1.18.1
+    prettier: ^2.8.4
+    puppeteer: ^3.0.4
+    typescript: ^4.9.5
+  bin:
+    servor: ./dist/cli.js
+  languageName: unknown
+  linkType: soft
+
 "@npmcli/fs@npm:^2.1.0":
   version: 2.1.2
   resolution: "@npmcli/fs@npm:2.1.2"
@@ -1128,22 +1144,6 @@ __metadata:
   checksum: ba9c7cbbf2b7884696523450a61fee1a09930d888b7a8d7579025ad93d459b2d1949ee5bbfeb188b2be5f4ac163544c5e98491ad6152df34154feebc2cc337c1
   languageName: node
   linkType: hard
-
-"servor@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "servor@workspace:."
-  dependencies:
-    "@types/http-proxy": ^1.17.10
-    "@types/node": ^18.14.6
-    chokidar: ^3.5.3
-    http-proxy: ^1.18.1
-    prettier: ^2.8.4
-    puppeteer: ^3.0.4
-    typescript: ^4.9.5
-  bin:
-    servor: ./dist/cli.js
-  languageName: unknown
-  linkType: soft
 
 "set-blocking@npm:^2.0.0":
   version: 2.0.0
