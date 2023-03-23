@@ -1,6 +1,6 @@
 {
   "name": "@mayflower-tech/servor",
-  "version": "5.0.0-alpha.4",
+  "version": "5.0.0-alpha.5",
   "description": "A dev server for single page app development",
   "repository": "@mayflower-tech/servor",
   "publishConfig": {
