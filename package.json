@@ -16,10 +16,8 @@
     "spa"
   ],
   "files": [
-    "dist/*",
-    "servor.ts",
-    "cli.ts",
-    "utils/*"
+    "dist/**/*",
+    "src/**/*"
   ],
   "scripts": {
     "start": "SWC_NODE_PROJECT=./tsconfig.json node -r @swc-node/register src/cli.ts tests/example index.html 8081 --reload --browse",
