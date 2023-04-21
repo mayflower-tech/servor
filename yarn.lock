@@ -21,6 +21,7 @@ __metadata:
     "@types/http-proxy": ^1.17.10
     "@types/node": ^18.14.6
     chokidar: ^3.5.3
+    commander: ^10.0.1
     http-proxy: ^1.18.1
     prettier: ^2.8.7
     puppeteer: ^3.0.4
@@ -480,6 +481,13 @@ __metadata:
   version: 2.0.20
   resolution: "colorette@npm:2.0.20"
   checksum: 0c016fea2b91b733eb9f4bcdb580018f52c0bc0979443dad930e5037a968237ac53d9beb98e218d2e9235834f8eebce7f8e080422d6194e957454255bde71d3d
+  languageName: node
+  linkType: hard
+
+"commander@npm:^10.0.1":
+  version: 10.0.1
+  resolution: "commander@npm:10.0.1"
+  checksum: 436901d64a818295803c1996cd856621a74f30b9f9e28a588e726b2b1670665bccd7c1a77007ebf328729f0139838a88a19265858a0fa7a8728c4656796db948
   languageName: node
   linkType: hard
 

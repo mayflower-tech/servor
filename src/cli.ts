@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { servor } from './servor';
 import openBrowser from './utils/openBrowser';
+import { program } from 'commander';
 
 const readCredentials = () => ({
   cert: fs.readFileSync(__dirname + '/servor.crt'),
@@ -15,35 +16,54 @@ const certify = () =>
   });
 
 (async () => {
-  const args = process.argv.slice(2).filter((x) => !~x.indexOf('--'));
+  // Parse arguments from the command line
+  program
+    .arguments('[root] [fallback] [port]')
+    .option('-r, --reload', 'reload on file change')
+    .option('-m, --module', 'serve javascript modules')
+    .option('-s, --static', 'serve static files')
+    .option('--secure', 'use https')
+    .option('-b, --browse', 'open browser on start')
+    .option('--localhost-only', 'only serve on localhost')
+    .option('--no-dir-listing', 'disable directory listing')
+    .option('--silent', 'disable console output')
+    .option('--editor', 'open code editor')
+    .parse(process.argv);
+
+  const opts = program.opts();
+  const argsRoot = program.args[0];
+  const fallback = program.args[1];
+  const argsPort = program.args[2];
+
+  // const args = process.argv.slice(2).filter((x) => !~x.indexOf('--'));
   const admin = process.getuid && process.getuid() === 0;
   let credentials;
 
-  if (args[0] && args[0].startsWith('gh:')) {
-    const repo = args[0].replace('gh:', '');
-    const dest = repo.split('/')[1];
-    if (!fs.existsSync(dest)) {
-      try {
-        require('child_process').execSync(`git clone https://github.com/${repo}`, { stdio: 'ignore' });
-      } catch (e) {
-        console.log(`\n  ⚠️  Could not clone from https://github.com/${repo}\n`);
-        process.exit();
-      }
-    }
-    args[0] = dest;
-  }
+  // if (args[0] && args[0].startsWith('gh:')) {
+  //   const repo = args[0].replace('gh:', '');
+  //   const dest = repo.split('/')[1];
+  //   if (!fs.existsSync(dest)) {
+  //     try {
+  //       require('child_process').execSync(`git clone https://github.com/${repo}`, { stdio: 'ignore' });
+  //     } catch (e) {
+  //       console.log(`\n  ⚠️  Could not clone from https://github.com/${repo}\n`);
+  //       process.exit();
+  //     }
+  //   }
+  //   args[0] = dest;
+  // }
 
-  if (~process.argv.indexOf('--editor')) {
+  if (opts.editor) {
     try {
-      require('child_process').execSync(`code ${args[0] || '.'}`);
+      require('child_process').execSync(`code ${argsRoot || '.'}`);
     } catch (e) {
-      console.log(`\n  ⚠️  Could not open code editor for ${args[0] || '.'}`);
+      console.log(`\n  ⚠️  Could not open code editor for ${argsRoot || '.'}`);
     }
   }
 
   // Generate ssl certificates
 
-  if (~process.argv.indexOf('--secure')) {
+  if (opts.secure) {
     admin && certify();
     admin && process.platform === 'darwin' && process.setuid?.(501);
     try {
@@ -59,23 +79,21 @@ const certify = () =>
     }
   }
 
-  // Parse arguments from the command line
-
   const { root, protocol, port, ips, url } = await servor({
-    root: args[0],
-    fallback: args[1],
-    port: args[2],
-    reload: !!~process.argv.indexOf('--reload'),
-    module: !!~process.argv.indexOf('--module'),
-    static: !!~process.argv.indexOf('--static'),
-    host: !!~process.argv.indexOf('--localhost-only') ? '127.0.0.1' : undefined,
-    noDirListing: !!~process.argv.indexOf('--no-dir-listing'),
+    root: argsRoot,
+    fallback,
+    port: argsPort,
+    reload: !!opts.reload,
+    module: !!opts.module,
+    static: !!opts.static,
+    host: !!opts.localhostOnly ? '127.0.0.1' : undefined,
+    noDirListing: !!opts.noDirListing,
     credentials,
   });
 
   // Output server details to the console
 
-  !~process.argv.indexOf('--silent') &&
+  !opts.silent &&
     console.log(`
   🗂  Serving:\t${root}\n
   🏡 Local:\t${url}
@@ -84,5 +102,5 @@ const certify = () =>
 
   // Browser the server index
 
-  !!~process.argv.indexOf('--browse') && openBrowser(url);
+  !!opts.browse && openBrowser(url);
 })();

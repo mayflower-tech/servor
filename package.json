@@ -22,7 +22,7 @@
     "utils/*"
   ],
   "scripts": {
-    "start": "node dist/cli.js tests/example --reload --browse --static --module",
+    "start": "SWC_NODE_PROJECT=./tsconfig.json node -r @swc-node/register src/cli.ts tests/example index.html 8081 --reload --browse",
     "build": "tsc",
     "cleanup": "rm -f servor.key servor.crt",
     "test": "npm run cleanup && cd tests && node index.js"
@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "chokidar": "^3.5.3",
+    "commander": "^10.0.1",
     "http-proxy": "^1.18.1"
   },
   "packageManager": "yarn@3.4.1",
