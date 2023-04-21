@@ -28,13 +28,13 @@ export const fileWatch = (
   chokidar.watch(x).on('all', cb);
 };
 
-export const usePort = (port: number | string = 0) =>
-  new Promise<string>((ok, x) => {
+export const usePort = (port?: number, host?: string) =>
+  new Promise<number>((ok, x) => {
     const s = net.createServer();
     s.on('error', x);
-    s.listen(port, () => {
+    s.listen(port, host, undefined, () => {
       const a = s.address();
-      s.close(() => (a ? ok(typeof a === 'string' ? a : a.port.toString()) : void 0));
+      s.close(() => (a && typeof a === 'object' ? ok(a.port) : void 0));
     });
   });
 

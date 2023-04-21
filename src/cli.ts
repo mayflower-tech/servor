@@ -18,48 +18,26 @@ const certify = () =>
 (async () => {
   // Parse arguments from the command line
   program
-    .arguments('[root] [fallback] [port]')
+    .arguments('[root]')
+    .option('-f, --fallback <fallback>', 'fallback file', 'index.html')
+    .option('-p, --port <port>', 'port to use', '8080')
     .option('-r, --reload', 'reload on file change')
     .option('-m, --module', 'serve javascript modules')
     .option('-s, --static', 'serve static files')
     .option('--secure', 'use https')
     .option('-b, --browse', 'open browser on start')
-    .option('--localhost-only', 'only serve on localhost')
-    .option('--no-dir-listing', 'disable directory listing')
+    .option('--host <host>', 'host to listen on')
+    .option('--dir-listing', 'enable directory listing')
     .option('--silent', 'disable console output')
-    .option('--editor', 'open code editor')
     .parse(process.argv);
 
   const opts = program.opts();
   const argsRoot = program.args[0];
-  const fallback = program.args[1];
-  const argsPort = program.args[2];
+  const fallback = opts.fallback;
+  const argsPort = opts.port;
 
-  // const args = process.argv.slice(2).filter((x) => !~x.indexOf('--'));
   const admin = process.getuid && process.getuid() === 0;
   let credentials;
-
-  // if (args[0] && args[0].startsWith('gh:')) {
-  //   const repo = args[0].replace('gh:', '');
-  //   const dest = repo.split('/')[1];
-  //   if (!fs.existsSync(dest)) {
-  //     try {
-  //       require('child_process').execSync(`git clone https://github.com/${repo}`, { stdio: 'ignore' });
-  //     } catch (e) {
-  //       console.log(`\n  ⚠️  Could not clone from https://github.com/${repo}\n`);
-  //       process.exit();
-  //     }
-  //   }
-  //   args[0] = dest;
-  // }
-
-  if (opts.editor) {
-    try {
-      require('child_process').execSync(`code ${argsRoot || '.'}`);
-    } catch (e) {
-      console.log(`\n  ⚠️  Could not open code editor for ${argsRoot || '.'}`);
-    }
-  }
 
   // Generate ssl certificates
 
@@ -83,11 +61,11 @@ const certify = () =>
     root: argsRoot,
     fallback,
     port: argsPort,
-    reload: !!opts.reload,
-    module: !!opts.module,
-    static: !!opts.static,
-    host: !!opts.localhostOnly ? '127.0.0.1' : undefined,
-    noDirListing: !!opts.noDirListing,
+    reload: opts.reload,
+    module: opts.module,
+    static: opts.static,
+    host: opts.host,
+    noDirListing: !opts.dirListing,
     credentials,
   });
 

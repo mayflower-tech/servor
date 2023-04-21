@@ -24,7 +24,7 @@ interface Options {
   static?: boolean;
   inject?: string;
   credentials?: any;
-  port?: string | number;
+  port?: number;
   host?: string;
   livereloadUrl?: string;
   proxy?: Record<string, string>;
@@ -40,22 +40,23 @@ export const servor = async ({
   inject = '',
   credentials,
   port: outerPort,
-  host = '127.0.0.1',
+  host,
   livereloadUrl = '/livereload',
   proxy: proxyConfigObj,
   noDirListing = false,
 }: Options = {}) => {
   // Try start on specified port then fail or find a free port
 
-  let port: string;
+  let port: number;
+  const envPort = process.env.PORT ? parseInt(process.env.PORT) : undefined;
   try {
-    port = await usePort(outerPort || process.env.PORT || 8080);
+    port = await usePort(outerPort || envPort || 8080, host);
   } catch (e) {
-    if (outerPort || process.env.PORT) {
+    if (outerPort || envPort) {
       console.log('[ERR] The port you have specified is already in use!');
       process.exit();
     }
-    port = await usePort();
+    port = await usePort(undefined, host);
   }
 
   const proxyConfig: Array<[RegExp, string]> = proxyConfigObj
@@ -231,7 +232,7 @@ export const servor = async ({
     if (reload && pathname === livereloadUrl) return serveReload(res);
     if (!isRouteRequest(pathname) && !(await isDir(pathname))) return await serveStaticFile(res, pathname);
     return await serveRoute(req, res, pathname);
-  }).listen(parseInt(port, 10), host);
+  }).listen(port, host);
 
   // Notify livereload reloadClients on file change
 
