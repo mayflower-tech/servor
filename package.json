@@ -1,26 +1,51 @@
 {
-  "name": "servor",
-  "version": "4.0.2",
-  "description": "A dependency free dev server for single page app development",
-  "repository": "lukejacksonn/servor",
-  "main": "./servor.js",
-  "bin": {
-    "servor": "./cli.js"
+  "name": "@mayflower-tech/servor",
+  "version": "5.0.0-alpha.7",
+  "description": "A dev server for single page app development",
+  "repository": "@mayflower-tech/servor",
+  "publishConfig": {
+    "access": "public"
   },
+  "type": "commonjs",
+  "main": "./dist/servor.js",
+  "bin": "./dist/cli.js",
   "keywords": [
     "server",
     "https",
     "livereload",
     "spa"
   ],
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
   "scripts": {
-    "start": "sudo node cli tests/example --reload --browse --secure --static --module",
+    "start": "SWC_NODE_PROJECT=./tsconfig.json node -r @swc-node/register src/cli.ts tests/example index.html 8081 --reload --browse",
+    "build": "tsc",
     "cleanup": "rm -f servor.key servor.crt",
     "test": "npm run cleanup && cd tests && node index.js"
   },
   "author": "Luke Jackson <lukejacksonn@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "puppeteer": "^3.0.4"
+    "@swc-node/register": "^1.6.4",
+    "@swc/core": "^1.3.53",
+    "@types/http-proxy": "^1.17.10",
+    "@types/node": "^18.14.6",
+    "prettier": "^2.8.7",
+    "puppeteer": "^3.0.4",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "commander": "^10.0.1",
+    "http-proxy": "^1.18.1"
+  },
+  "packageManager": "yarn@3.4.1",
+  "prettier": {
+    "printWidth": 120,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "endOfLine": "auto"
   }
 }

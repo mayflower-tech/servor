@@ -1,0 +1,24 @@
+name: Node.js Package
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: yarn
+          registry-url: 'https://registry.npmjs.org'
+      - run: yarn install --immutable
+      - run: yarn build
+      - run: yarn npm publish --tag alpha
+        env:
+          YARN_NPM_AUTH_TOKEN: ${{secrets.YARN_NPM_AUTH_TOKEN}}
