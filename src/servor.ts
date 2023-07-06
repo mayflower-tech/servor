@@ -17,8 +17,6 @@ import { fileWatch, usePort, networkIps } from './utils/common';
 import { existsSync } from 'node:fs';
 import Server from 'http-proxy';
 
-type ServerOptionsWithTarget = Server.ServerOptions & { target: string };
-
 interface Options {
   root?: string;
   module?: boolean;
@@ -30,7 +28,7 @@ interface Options {
   port?: number;
   host?: string;
   livereloadUrl?: string;
-  proxy?: Record<string, string> | Record<string, ServerOptionsWithTarget>;
+  proxy?: Record<string, Server.ServerOptions>;
   noDirListing?: boolean;
 }
 
@@ -62,7 +60,7 @@ export const servor = async ({
     port = await usePort(undefined, host);
   }
 
-  const proxyConfig: Array<[RegExp, string | Server.ServerOptions]> = proxyConfigObj
+  const proxyConfig: Array<[RegExp, Server.ServerOptions]> = proxyConfigObj
     ? Object.keys(proxyConfigObj).map((key) => [new RegExp(key), proxyConfigObj![key]])
     : [];
 
@@ -186,11 +184,9 @@ export const servor = async ({
   const serveRoute = async (req: http2.Http2ServerRequest, res: http2.Http2ServerResponse, pathname: string) => {
     try {
       for (let i = 0; i < proxyConfig.length; i++) {
-        const [key, value] = proxyConfig[i];
+        const [key, options] = proxyConfig[i];
         if (key.test(pathname) && proxy) {
-          const optionsAsObject = typeof value === 'string' ? { target: value } : value;
-
-          return proxy.web(req, res, { changeOrigin: true, ...optionsAsObject });
+          return proxy.web(req, res, options);
         }
       }
       const index = staticMode ? path.join(root, pathname, fallback) : path.join(root, fallback);
