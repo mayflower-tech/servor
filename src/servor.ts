@@ -15,6 +15,9 @@ import directoryListing from './utils/directoryListing';
 
 import { fileWatch, usePort, networkIps } from './utils/common';
 import { existsSync } from 'node:fs';
+import Server from 'http-proxy';
+
+type ServerOptionsWithTarget = Server.ServerOptions & { target: string };
 
 interface Options {
   root?: string;
@@ -27,7 +30,7 @@ interface Options {
   port?: number;
   host?: string;
   livereloadUrl?: string;
-  proxy?: Record<string, string>;
+  proxy?: Record<string, string> | Record<string, ServerOptionsWithTarget>;
   noDirListing?: boolean;
 }
 
@@ -59,11 +62,11 @@ export const servor = async ({
     port = await usePort(undefined, host);
   }
 
-  const proxyConfig: Array<[RegExp, string]> = proxyConfigObj
+  const proxyConfig: Array<[RegExp, string | Server.ServerOptions]> = proxyConfigObj
     ? Object.keys(proxyConfigObj).map((key) => [new RegExp(key), proxyConfigObj![key]])
     : [];
 
-  let proxy: { web: (arg0: any, arg1: any, arg2: { target: any; changeOrigin: boolean }) => any };
+  let proxy: { web: (arg0: any, arg1: any, arg2: Server.ServerOptions) => any };
 
   // Configure globals
 
@@ -185,7 +188,9 @@ export const servor = async ({
       for (let i = 0; i < proxyConfig.length; i++) {
         const [key, value] = proxyConfig[i];
         if (key.test(pathname) && proxy) {
-          return proxy.web(req, res, { target: value, changeOrigin: true });
+          const optionsAsObject = typeof value === 'string' ? { target: value } : value;
+
+          return proxy.web(req, res, { changeOrigin: true, ...optionsAsObject });
         }
       }
       const index = staticMode ? path.join(root, pathname, fallback) : path.join(root, fallback);
