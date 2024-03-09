@@ -7,13 +7,14 @@ import https from 'node:https';
 import zlib from 'node:zlib';
 import { promisify } from 'node:util';
 import httpProxy from 'http-proxy';
+import process from "node:process";
 
 const gzip = promisify(zlib.gzip);
 
-import mimeTypes from './utils/mimeTypes';
-import directoryListing from './utils/directoryListing';
+import mimeTypes from './utils/mimeTypes.ts';
+import directoryListing from './utils/directoryListing.ts';
 
-import { fileWatch, usePort, networkIps } from './utils/common';
+import { fileWatch, usePort, networkIps } from './utils/common.ts';
 import { existsSync } from 'node:fs';
 import Server from 'http-proxy';
 
@@ -108,9 +109,6 @@ export const servor = async ({
   const isRouteRequest = (pathname: string) => !~pathname.split('/').pop()!.indexOf('.');
   const isDir = async (pathname: string) =>
     existsSync(pathname.split('/').pop()!) && (await fs.lstat(pathname.split('/').pop()!)).isDirectory();
-  const utf8 = (file: WithImplicitCoercion<string> | { [Symbol.toPrimitive](hint: 'string'): string }) =>
-    Buffer.from(file, 'binary').toString('utf8');
-
   const baseDoc = (pathname = '', base = path.join('/', pathname, '/')) =>
     `<!doctype html><meta charset="utf-8"/><base href="${base}"/>`;
 
@@ -123,7 +121,7 @@ export const servor = async ({
   const _sendFile = (
     res: http2.Http2ServerResponse,
     status: number,
-    file: any,
+    file: string | Uint8Array,
     ext: string,
     encoding: BufferEncoding
   ) => {
@@ -132,10 +130,10 @@ export const servor = async ({
     res.end();
   };
 
-  const sendFile = async (res: http2.Http2ServerResponse, status: number, file: any, ext: string) => {
-    if (['js', 'css', 'html', 'json', 'xml', 'svg'].includes(ext)) {
+  const sendFile = async (res: http2.Http2ServerResponse, status: number, file: string | Uint8Array, ext: string) => {
+    if ([ 'js', 'css', 'html', 'json', 'xml', 'svg' ].includes(ext)) {
       res.setHeader('content-encoding', 'gzip');
-      const content = await gzip(utf8(file));
+      const content = await gzip(file);
       _sendFile(res, status, content, ext, 'utf-8');
     } else {
       _sendFile(res, status, file, ext, 'binary');
@@ -174,7 +172,8 @@ export const servor = async ({
       } else {
         await sendFile(res, 200, file, ext);
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
       return sendError(res, 500);
     }
   };
@@ -201,7 +200,8 @@ export const servor = async ({
         return await sendFile(res, status, baseDoc(pathname) + file, 'html');
       }
       return await sendFile(res, status, file + inject + livereload, 'html');
-    } catch {
+    } catch (err) {
+      console.error(err);
       return sendError(res, 500);
     }
   };

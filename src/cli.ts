@@ -1,18 +1,19 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
-import path from 'node:path';
-import { servor } from './servor';
-import openBrowser from './utils/openBrowser';
+import { servor } from './servor.ts';
+import openBrowser from './utils/openBrowser.ts';
 import { program } from 'commander';
+import { fileURLToPath } from "node:url";
+import process from "node:process";
 
 const readCredentials = () => ({
-  cert: fs.readFileSync(__dirname + '/servor.crt'),
-  key: fs.readFileSync(__dirname + '/servor.key'),
+  cert: fs.readFileSync(new URL('servor.crt', import.meta.url)),
+  key: fs.readFileSync(new URL('servor.key', import.meta.url)),
 });
 
 const certify = () =>
-  require('child_process').execSync(path.resolve(__dirname, '../certify.sh'), {
-    cwd: __dirname,
+  require('child_process').execSync(new URL('../certify.sh', import.meta.url), {
+    cwd: fileURLToPath(import.meta.url),
   });
 
 (async () => {
