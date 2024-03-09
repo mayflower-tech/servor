@@ -6,7 +6,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "type": "commonjs",
+  "type": "module",
   "main": "./dist/servor.js",
   "bin": "./dist/cli.js",
   "keywords": [
@@ -20,7 +20,7 @@
     "src/**/*"
   ],
   "scripts": {
-    "start": "SWC_NODE_PROJECT=./tsconfig.json node -r @swc-node/register src/cli.ts tests/example index.html 8081 --reload --browse",
+    "start": "SWC_NODE_PROJECT=./tsconfig.json node --import @swc-node/register/esm-register src/cli.ts tests/example index.html 8081 --reload --browse",
     "build": "tsc",
     "cleanup": "rm -f servor.key servor.crt",
     "test": "npm run cleanup && cd tests && node index.js"
@@ -28,13 +28,13 @@
   "author": "Luke Jackson <lukejacksonn@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@swc-node/register": "^1.6.4",
+    "@swc-node/register": "^1.8.0",
     "@swc/core": "^1.3.53",
     "@types/http-proxy": "^1.17.10",
     "@types/node": "^18.14.6",
     "prettier": "^2.8.7",
     "puppeteer": "^3.0.4",
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.0"
   },
   "dependencies": {
     "chokidar": "^3.5.3",

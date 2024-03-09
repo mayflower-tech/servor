@@ -1,6 +1,6 @@
-import fs from 'fs';
-import os, { NetworkInterfaceInfo } from 'os';
-import net from 'net';
+import fs from 'node:fs';
+import os, { NetworkInterfaceInfo } from 'node:os';
+import net from 'node:net';
 import chokidar from 'chokidar';
 
 // recursive function that checks if a file is still changing
