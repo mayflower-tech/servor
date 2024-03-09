@@ -19,13 +19,17 @@ const awaitWriteFinish = (path: fs.PathLike, prev: { mtimeNs: bigint }, cb: () =
 
 export const fileWatch = (
   x: string | readonly string[],
-  cb: (
-    eventName: 'add' | 'addDir' | 'change' | 'unlink' | 'unlinkDir',
-    path: string,
-    stats?: fs.Stats | undefined
-  ) => void
+  cb: () => void
 ) => {
-  chokidar.watch(x).on('all', cb);
+  if ('Deno' in globalThis) {
+    (async () => {
+      for await (const iterator of (globalThis as any).Deno.watchFs(x, { recursive: true })) {
+        cb();
+      }
+    })();
+  } else {
+    chokidar.watch(x).on('all', cb);
+  }
 };
 
 export const usePort = (port?: number, host?: string) =>
